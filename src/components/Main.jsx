@@ -1,7 +1,9 @@
-import React, { useState, useAsync, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import Web3 from 'web3'
-import { unlockAccount } from '../api/web3'
+import Election from '../abi/Election'
+
+import Form from './Form'
 
 const Wrapper = styled.div`
   display: flex;
@@ -23,7 +25,8 @@ const Button = styled.button`
 
 export default function Main() {
 
-    const [account, setAccount] = useState('')
+  const [account, setAccount] = useState('')
+
 
     const loadWeb3 = async() => {
         if(window.ethereum) {
@@ -36,36 +39,42 @@ export default function Main() {
         }
     }
 
-    const loadAccount = async() => {
+    const loadBlockchainData = async() => {
+      const web3 = window.web3
+      const accounts = await web3.eth.getAccounts()
+      const user = accounts[0]
+      setAccount(user)
+      const networkId = await web3.eth.net.getId()
+      const networkData = Election.networks[networkId]
 
-        const web3 = window.web3
-
-        const user = await web3.eth.getAccounts()
-        setAccount(user)
+      if(networkData) {
+        const election = new web3.eth.Contract(Election.abi, networkData.address)
+        console.log(election)
+      } else {
+        window.alert('Smart contract not deployed on current network')
+      }
+  
     }
 
     useEffect(() => {
-        if(account === ''){
             loadWeb3()
-            loadAccount()
-        }
-    })
-
-
-
-
+            loadBlockchainData()
+    }, [])
 
 
 
     return (
+      <>
     <Wrapper>
       <Div>
-        MetaMask
           <Button >
             MetaMask
           </Button>
         Account: { account }
       </Div>
     </Wrapper>
+      <br/>
+      <Form/>
+    </>
     )
 }
