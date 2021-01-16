@@ -2,26 +2,34 @@ import React from 'react'
 import styled from 'styled-components'
 
 const Container = styled.div`
+    padding-left: 3rem;
+`;
+
+const Title = styled.h2`
 
 `;
 
-const List = styled.ul`
-
+const Td = styled.td`
+    border: 1px solid #cccccc;
+    width: 16vh;
 `;
 
-const Items = styled.li`
+export default function Results(props) {
 
-`;
 
-export default function Results() {
+    let name = 'Orange Man'
+    let percentage = 100 + '%'
+
+
+
     return (
         <Container>
-            <List>
-                <Items></Items>
-                <Items></Items>
-                <Items></Items>
-                <Items></Items>
-            </List>
+            <Title>Candidates</Title>
+            <tr>
+                <Td>{name}</Td>
+                <Td>{props.voteCount}</Td>
+                <Td>{percentage}</Td>
+            </tr>
         </Container>
     )
 }

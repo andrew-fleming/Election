@@ -4,6 +4,7 @@ import Web3 from 'web3'
 import Election from '../abi/Election'
 
 import Form from './Form'
+import Results from './Results'
 
 const Wrapper = styled.div`
   display: flex;
@@ -16,16 +17,14 @@ const Div = styled.div`
   align-items: center;
 `;
 
-const Button = styled.button`
-  width: 5rem;
-  height: 2.5rem;
-`;
-
 
 
 export default function Main() {
 
   const [account, setAccount] = useState('')
+  const [election, setElection] = useState({})
+  const [voteCount, setVoteCount] = useState('')
+  const [candidate, setCandidate] = useState([]);
 
 
     const loadWeb3 = async() => {
@@ -48,33 +47,52 @@ export default function Main() {
       const networkData = Election.networks[networkId]
 
       if(networkData) {
-        const election = new web3.eth.Contract(Election.abi, networkData.address)
-        console.log(election)
+        const contract = new web3.eth.Contract(Election.abi, networkData.address)
+        return contract
       } else {
         window.alert('Smart contract not deployed on current network')
       }
   
     }
 
+    const fetchVotes = async() => {
+      let pres = await election.methods.voteCount(0).call()
+      if(pres !== 'undefined'){
+        setVoteCount(pres)
+      }
+    }
+
+
+
     useEffect(() => {
             loadWeb3()
-            loadBlockchainData()
+            loadBlockchainData().then(res => {
+              setElection(res)
+              fetchVotes()
+            })
+            
     }, [])
 
+
+    const vote = async(_candidate) => {
+      let config = { from: account }
+      election.methods.vote(_candidate).send(config)
+        .on('receipt', function(receipt){
+          console.log(receipt)
+        })
+    }
 
 
     return (
       <>
     <Wrapper>
       <Div>
-          <Button >
-            MetaMask
-          </Button>
         Account: { account }
       </Div>
     </Wrapper>
       <br/>
-      <Form/>
+      <Form vote={vote}/>
+      <Results voteCount={voteCount}/>
     </>
     )
 }

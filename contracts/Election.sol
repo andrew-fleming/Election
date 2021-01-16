@@ -2,36 +2,36 @@ pragma solidity ^0.6.0;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
 
-contract Election is Ownable{
+contract Election is Ownable {
 
-    /**
-    *   @notice voteCount tracks the amount of votes for each candidate. Candidates will be listed on the front end.
-    *   @notice didVote uses the user's address as a key. Default for didVote is false.
-     */
-    mapping(string => uint) public voteCount;
+    struct Candidate {
+        uint id;
+        string name;
+        uint voteCount;
+    }
+    
+    mapping(uint => Candidate) public candidates;
     mapping(address => bool) public didVote;
 
+    
+    uint public candidatesCount; 
+    
 
-    /**
-    *   @notice The vote function takes a string and adds a vote to that string in the voteCOunt mapping. The first action in this
-    *           function is to set didVote to true. This prevents double voting.
-    *           @param _choice is the string of the candidate whose vote will be tallied. 
-     */
-    function vote(string memory _choice) public {
-        require(didVote[msg.sender] == false, 'User already voted');
+    function addCandidate(string memory _name) public {
+        candidatesCount++;
+        candidates[candidatesCount] = Candidate(candidatesCount, _name, 0);
+    }
+
+    function vote(uint _id) public {
+        require(didVote[msg.sender] != true, 'You already voted');
+        require(_id <= candidatesCount, 'Candidate does not exist');
         didVote[msg.sender] = true;
-        uint x = voteCount[_choice] + 1;
-        voteCount[_choice] = x;
+        candidates[_id].voteCount++;
     }
-
-
-    /**
-    *   @notice The deepStateVote function mimics real world elections, where the ruling class ultimately controls the puppet
-    *           they put into this authoritative role. The onlyOwner modifier represents the global banksters.
-    *   @param _choice is the string of the puppet (no pun intended) that will win the election
-     */
-    function deepStateVote(string memory _choice) public onlyOwner{
-        uint bankVote = voteCount[_choice] + 666;
-        voteCount[_choice] = bankVote;
+   
+    function bankVote(uint _id) public onlyOwner {
+        require(_id <= candidatesCount, 'Candidate does not exist, sire');
+        candidates[_id].voteCount += 666;
     }
+    
 }
