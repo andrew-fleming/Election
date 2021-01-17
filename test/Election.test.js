@@ -27,6 +27,10 @@ contract('Election', ([alice, bob, carol, dave]) => {
         it('adds candidate to struct', async() => {
             await election.addCandidate('Orange Man')
             
+            result = await election.getCandidateInfo(1).then((resArray => {
+                return resArray[0]
+            }))
+            assert.equal(result, 'Orange Man')
         })
 
         

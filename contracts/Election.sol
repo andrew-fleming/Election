@@ -33,5 +33,10 @@ contract Election is Ownable {
         require(_id <= candidatesCount, 'Candidate does not exist, sire');
         candidates[_id].voteCount += 666;
     }
+
+    function getCandidateInfo(uint _id) public view returns(string memory, uint){
+        Candidate memory candidate = candidates[_id];
+        return (candidate.name, candidate.voteCount);
+    }
     
 }
