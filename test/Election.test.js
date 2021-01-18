@@ -8,7 +8,7 @@ require('chai')
     .use(require('chai-as-promised'))
     .should()
 
-contract('Election', ([alice, bob, carol, dave]) => {
+contract('Election', ([alice, bob]) => {
     let election, result
 
     //recreate migration

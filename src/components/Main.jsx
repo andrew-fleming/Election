@@ -55,23 +55,26 @@ export default function Main() {
   
     }
 
-    const fetchVotes = async() => {
-      let pres = await election.methods.voteCount(0).call()
-      if(pres !== 'undefined'){
-        setVoteCount(pres)
-      }
+    const fetchCandidate = async(_contract) => {
+      let name = await _contract.methods
+      console.log(name)
     }
 
+    const fetchVotes = async(_contract) => {
+      let count = await _contract.methods.voteCount(0).call()
+      setVoteCount(count)
+    }
 
 
     useEffect(() => {
             loadWeb3()
             loadBlockchainData().then(res => {
               setElection(res)
-              fetchVotes()
-            })
-            
+              //fetchVotes(res)
+              //fetchCandidate(res)
+            }) 
     }, [])
+
 
 
     const vote = async(_candidate) => {
