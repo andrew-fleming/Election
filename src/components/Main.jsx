@@ -55,6 +55,13 @@ export default function Main() {
   
     }
 
+    const addCandidate = async(_name) => {
+      let name = await election.methods.addCandidate(_name).send()
+      .on('receipt', receipt => {
+        console.log(receipt)
+      })
+    }
+
     const fetchCandidate = async(_contract) => {
       let name = await _contract.methods
       console.log(name)
@@ -95,7 +102,6 @@ export default function Main() {
     </Wrapper>
       <br/>
       <Form vote={vote}/>
-      <Results voteCount={voteCount}/>
     </>
     )
 }
