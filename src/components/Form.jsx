@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import Results from './Results'
+import Results from './CandidateList'
 
 const Container = styled.div`
     

@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import styled from 'styled-components'
 import Web3 from 'web3'
 import Election from '../abi/Election'
 
 import Form from './Form'
-import Results from './Results'
 
 const Wrapper = styled.div`
   display: flex;
@@ -21,11 +20,12 @@ const Div = styled.div`
 
 export default function Main() {
 
+
+
   const [account, setAccount] = useState('')
   const [election, setElection] = useState({})
   const [voteCount, setVoteCount] = useState('')
-  const [candidate, setCandidate] = useState([]);
-
+  const [numCandidates, setNumCandidates] = useState('')
 
     const loadWeb3 = async() => {
         if(window.ethereum) {
@@ -55,6 +55,12 @@ export default function Main() {
   
     }
 
+    const fetchNumCandidates = async(_contract) => {
+      let num = await _contract.methods.candidatesCount().call()
+      setNumCandidates(num)
+      console.log(num)
+    }
+
     const addCandidate = async(_name) => {
       let name = await election.methods.addCandidate(_name).send()
       .on('receipt', receipt => {
@@ -64,23 +70,29 @@ export default function Main() {
 
     const fetchCandidate = async(_contract) => {
       let name = await _contract.methods
-      console.log(name)
     }
 
-    const fetchVotes = async(_contract) => {
+    const fetchVotes = useCallback(async(_contract) => {
       let count = await _contract.methods.voteCount(0).call()
       setVoteCount(count)
-    }
+    }, [setVoteCount])
 
 
     useEffect(() => {
             loadWeb3()
-            loadBlockchainData().then(res => {
-              setElection(res)
+            loadBlockchainData().then(async(res) => {
+              await setElection(res)
+              await fetchNumCandidates(res)
               //fetchVotes(res)
               //fetchCandidate(res)
             }) 
     }, [])
+
+    useEffect(() => {
+      if(numCandidates > 0){
+        fetchVotes()
+      }
+    }, [numCandidates, fetchVotes])
 
 
 
@@ -98,6 +110,8 @@ export default function Main() {
     <Wrapper>
       <Div>
         Account: { account }
+        <br/>
+        {numCandidates}
       </Div>
     </Wrapper>
       <br/>
